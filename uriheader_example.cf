@@ -1,0 +1,39 @@
+#################################################################
+#                                                               #
+# Created by Markus at TitanHQ                                  #
+# Copyright (c) 2006-2017, Copperfasten Technologies, Teoranta. #
+# Version 1.0.5                                                 #
+#                                                               #
+#################################################################
+loadplugin Mail::SpamAssassin::Plugin::URIHeader uriheader.pm
+
+ifplugin    Mail::SpamAssassin::Plugin::URIHeader
+    uriheader_cache_dsn DBI:Pg:dbname=scrubber;host=127.0.0.1;port=5432
+    uriheader_cache_username amavisd
+    uriheader_cache_password amavisd
+
+    uriheader   URI_LINKS_TO_MSWORD      Content-Type =~ /application\/msword/i
+    describe    URI_LINKS_TO_MSWORD      URI has direct download link to msword document
+    tflags      URI_LINKS_TO_MSWORD      net
+    score       URI_LINKS_TO_MSWORD      3
+
+    uriheader   URI_LINKS_TO_MACRO       Content-Type =~ /application\/.*macroEnabled/i
+    describe    URI_LINKS_TO_MACRO       URI has direct download link to macro-enabled document
+    tflags      URI_LINKS_TO_MACRO       net
+    score       URI_LINKS_TO_MACRO       1.5
+
+    uriheader   URI_LINKS_TO_RTF         Content-Type =~ /rtf/i
+    describe    URI_LINKS_TO_RTF         URI has direct download link to an RTF file
+    tflags      URI_LINKS_TO_RTF         net
+    score       URI_LINKS_TO_RTF         1.5
+
+    uriheader   URI_LINKS_TO_PDF         Content-Type =~ /application\/pdf/i
+    describe    URI_LINKS_TO_PDF         URI has direct download link to pdf document
+    tflags      URI_LINKS_TO_PDF         net
+    score       URI_LINKS_TO_PDF         0.1
+
+    uriheader   URI_LINKS_TO_BINARY      Content-Transfer-Encoding =~ /\bbinary\b/i
+    describe    URI_LINKS_TO_BINARY      URI has direct download link to a bunary file
+    tflags      URI_LINKS_TO_BINARY      net
+    score       URI_LINKS_TO_BINARY      0.75
+endif
