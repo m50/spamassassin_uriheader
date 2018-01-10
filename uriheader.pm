@@ -4,9 +4,6 @@
 # Copyright (c) 2006-2017, Copperfasten Technologies, Teoranta. #
 # Version 1.0.0                                                 #
 #                                                               #
-#   NOTE:                                                       #
-# Do not use this, as it can cause slow downs and abuse alerts  #
-#                                                               #
 #################################################################
 
 =head1 NAME
@@ -226,12 +223,7 @@ sub parsed_metadata {
         } else {
             my $res = $ua->head($uri);
             if($res->is_success) {
-                if($self->{caching}) {
-                    my $headers = $res->as_string;
-                    $headers =~ s/'/''/g;
-                    $self->{cache_dbh}->do("INSERT INTO uriheader_cache (uri, headers) VALUES ('$uri', '$headers');");
-                    dbg("$modulename: NOTIF: caching $uri");
-                }
+                $headers = '';
                 for my $line (split /(\n)/, $res->as_string) {
                     next if $line =~ /200\s+OK/i;
                     my ($hdr, $value) = split /:/, $line;
@@ -240,8 +232,14 @@ sub parsed_metadata {
                     next if $hdr eq "";
                     chomp $value;
                     next if $value eq "";
+                    $headers .= "$hdr\n";
                     dbg("$modulename: $uri Found Header: Header: $hdr: $value");
                     $scanner->{uri_headers}->{$uri}->{$hdr} = $value;
+                }
+                if($self->{caching}) {
+                    $headers =~ s/'/''/g;
+                    $self->{cache_dbh}->do("INSERT INTO uriheader_cache (uri, headers) VALUES ('$uri', '$headers');");
+                    dbg("$modulename: NOTIF: caching $uri");
                 }
             }
         }
