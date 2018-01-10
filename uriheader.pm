@@ -232,7 +232,7 @@ sub parsed_metadata {
                     next if $hdr eq "";
                     chomp $value;
                     next if $value eq "";
-                    $headers .= "$hdr\n";
+                    $headers .= "$hdr: $value\n";
                     dbg("$modulename: $uri Found Header: Header: $hdr: $value");
                     $scanner->{uri_headers}->{$uri}->{$hdr} = $value;
                 }
