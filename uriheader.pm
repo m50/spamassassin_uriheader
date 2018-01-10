@@ -223,7 +223,7 @@ sub parsed_metadata {
         } else {
             my $res = $ua->head($uri);
             if($res->is_success) {
-                $headers = '';
+                my $headers = '';
                 for my $line (split /(\n)/, $res->as_string) {
                     next if $line =~ /200\s+OK/i;
                     my ($hdr, $value) = split /:/, $line;
